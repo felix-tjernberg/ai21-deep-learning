@@ -2,11 +2,14 @@ import matplotlib.pyplot as plt
 from random import shuffle, seed
 
 
-def plot_sample_images(image_list: list):
+def plot_sample_images(image_list, labels: bool = True):
     fig, axes = plt.subplots(2, 5, figsize=(10, 4))
     for index, ax in enumerate(axes.flatten()):
-        ax.imshow(image_list[index][0], cmap="gray")
-        ax.set_title(image_list[index][1])
+        if labels:
+            ax.imshow(image_list[index][0], cmap="gray")
+            ax.set_title(image_list[index][1])
+        else:
+            ax.imshow(image_list[index])
         ax.axis("off")
     fig.tight_layout()
 
