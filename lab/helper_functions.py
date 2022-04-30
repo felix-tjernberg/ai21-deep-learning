@@ -1,5 +1,18 @@
 import matplotlib.pyplot as plt
-from random import shuffle, seed
+import pandas as pd
+from random import shuffle
+
+
+def plot_and_print_model_metrics(model):
+    _, ax = plt.subplots(1, 2, figsize=(12, 4))
+    metrics = pd.DataFrame(model.history.history)
+    print(f'val_acc: {metrics["val_acc"].iloc[-1]}')
+    metrics[["loss", "val_loss"]].plot(ax=ax[0], grid=True)
+    metrics[["acc", "val_acc"]].plot(ax=ax[1], grid=True)
+
+
+def flatten_list(list):
+    return [item for sublist in list for item in sublist]
 
 
 def plot_sample_images(image_list, labels: bool = True):
