@@ -102,6 +102,7 @@ y_train.shape
 train_image_generator = ImageDataGenerator(
     rotation_range=90,
     shear_range=0.2,
+    horizontal_flip=True,
     zoom_range=0.2,
     height_shift_range=0.2,
     width_shift_range=0.2,
