@@ -1,9 +1,9 @@
+from tkinter.messagebox import RETRY
 from cv2 import resize
 from helper_functions import (
     shuffle_list,
     check_if_cat_mac,
     check_if_cat_windows,
-    plot_sample_images,
 )
 from os.path import abspath
 from random import seed
@@ -19,7 +19,7 @@ current_directory = abspath("")
 if platform == "darwin":
     train_images = shuffle_list(
         [
-            (plt.imread(file_path), check_if_cat_mac(file_path))
+            (plt.imread(file_path), check_if_cat_mac(file_path, return_one_hot=True))
             for file_path in glob.glob(
                 f"{current_directory}/experiment_small_dataset/train/*.jpg"
             )
@@ -28,7 +28,7 @@ if platform == "darwin":
 
     val_images = shuffle_list(
         [
-            (plt.imread(file_path), check_if_cat_mac(file_path))
+            (plt.imread(file_path), check_if_cat_mac(file_path, return_one_hot=True))
             for file_path in glob.glob(
                 f"{current_directory}/experiment_small_dataset/val/*.jpg"
             )
@@ -37,7 +37,7 @@ if platform == "darwin":
 
     test_images = shuffle_list(
         [
-            (plt.imread(file_path), check_if_cat_mac(file_path))
+            (plt.imread(file_path), check_if_cat_mac(file_path, return_one_hot=True))
             for file_path in glob.glob(
                 f"{current_directory}/experiment_small_dataset/test/*.jpg"
             )
@@ -47,7 +47,10 @@ if platform == "darwin":
 if platform == "win32":
     train_images = shuffle_list(
         [
-            (plt.imread(file_path), check_if_cat_windows(file_path))
+            (
+                plt.imread(file_path),
+                check_if_cat_windows(file_path, return_one_hot=True),
+            )
             for file_path in glob.glob(
                 f"{current_directory}/experiment_small_dataset/train/*.jpg"
             )
@@ -56,7 +59,10 @@ if platform == "win32":
 
     val_images = shuffle_list(
         [
-            (plt.imread(file_path), check_if_cat_windows(file_path))
+            (
+                plt.imread(file_path),
+                check_if_cat_windows(file_path, return_one_hot=True),
+            )
             for file_path in glob.glob(
                 f"{current_directory}/experiment_small_dataset/val/*.jpg"
             )
@@ -65,7 +71,10 @@ if platform == "win32":
 
     test_images = shuffle_list(
         [
-            (plt.imread(file_path), check_if_cat_windows(file_path))
+            (
+                plt.imread(file_path),
+                check_if_cat_windows(file_path, return_one_hot=True),
+            )
             for file_path in glob.glob(
                 f"{current_directory}/experiment_small_dataset/test/*.jpg"
             )
