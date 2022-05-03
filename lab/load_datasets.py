@@ -1,10 +1,6 @@
 from tkinter.messagebox import RETRY
 from cv2 import resize
-from helper_functions import (
-    shuffle_list,
-    check_if_cat_mac,
-    check_if_cat_windows,
-)
+from helper_functions import shuffle_list, check_if_cat
 from os.path import abspath
 from random import seed
 from sys import platform
@@ -16,70 +12,32 @@ import numpy as np
 seed(418)
 current_directory = abspath("")
 
-if platform == "darwin":
-    train_images = shuffle_list(
-        [
-            (plt.imread(file_path), check_if_cat_mac(file_path, return_one_hot=True))
-            for file_path in glob.glob(
-                f"{current_directory}/experiment_small_dataset/train/*.jpg"
-            )
-        ]
-    )
+train_images = shuffle_list(
+    [
+        (plt.imread(file_path), check_if_cat(file_path, return_one_hot=True))
+        for file_path in glob.glob(
+            f"{current_directory}/experiment_small_dataset/train/*.jpg"
+        )
+    ]
+)
 
-    val_images = shuffle_list(
-        [
-            (plt.imread(file_path), check_if_cat_mac(file_path, return_one_hot=True))
-            for file_path in glob.glob(
-                f"{current_directory}/experiment_small_dataset/val/*.jpg"
-            )
-        ]
-    )
+val_images = shuffle_list(
+    [
+        (plt.imread(file_path), check_if_cat(file_path, return_one_hot=True))
+        for file_path in glob.glob(
+            f"{current_directory}/experiment_small_dataset/val/*.jpg"
+        )
+    ]
+)
 
-    test_images = shuffle_list(
-        [
-            (plt.imread(file_path), check_if_cat_mac(file_path, return_one_hot=True))
-            for file_path in glob.glob(
-                f"{current_directory}/experiment_small_dataset/test/*.jpg"
-            )
-        ]
-    )
-
-if platform == "win32":
-    train_images = shuffle_list(
-        [
-            (
-                plt.imread(file_path),
-                check_if_cat_windows(file_path, return_one_hot=True),
-            )
-            for file_path in glob.glob(
-                f"{current_directory}/experiment_small_dataset/train/*.jpg"
-            )
-        ]
-    )
-
-    val_images = shuffle_list(
-        [
-            (
-                plt.imread(file_path),
-                check_if_cat_windows(file_path, return_one_hot=True),
-            )
-            for file_path in glob.glob(
-                f"{current_directory}/experiment_small_dataset/val/*.jpg"
-            )
-        ]
-    )
-
-    test_images = shuffle_list(
-        [
-            (
-                plt.imread(file_path),
-                check_if_cat_windows(file_path, return_one_hot=True),
-            )
-            for file_path in glob.glob(
-                f"{current_directory}/experiment_small_dataset/test/*.jpg"
-            )
-        ]
-    )
+test_images = shuffle_list(
+    [
+        (plt.imread(file_path), check_if_cat(file_path, return_one_hot=True))
+        for file_path in glob.glob(
+            f"{current_directory}/experiment_small_dataset/test/*.jpg"
+        )
+    ]
+)
 
 
 resized_train_images = [
@@ -107,12 +65,11 @@ train_image_generator = ImageDataGenerator(
     height_shift_range=0.2,
     width_shift_range=0.2,
 )
-test_image_generator = ImageDataGenerator()
+val_image_generator = ImageDataGenerator()
 
 train_val_generator = train_image_generator.flow(X_train, y_train, batch_size=32)
-val_generator = test_image_generator.flow(X_val, y_val, batch_size=32)
+val_generator = val_image_generator.flow(X_val, y_val, batch_size=32)
 
-train_generator = test_image_generator.flow(
+train_generator = val_image_generator.flow(
     np.concatenate((X_train, X_val)), np.concatenate((y_train, y_val)), batch_size=32
 )
-test_generator = test_image_generator.flow(X_test, y_test, batch_size=32)

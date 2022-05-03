@@ -18,19 +18,8 @@ def plot_sample_images(image_list, labels: bool = True):
     fig.tight_layout()
 
 
-def check_if_cat_windows(file_path, return_one_hot: bool = False):
-    if file_path.split("/")[-1][6:].split(".")[0] == "cat":
-        if return_one_hot:
-            return 0
-        return "cat"
-    else:
-        if return_one_hot:
-            return 1
-        return "dog"
-
-
-def check_if_cat_mac(file_path, return_one_hot: bool = False):
-    if file_path.split("/")[-1].split(".")[0] == "cat":
+def check_if_cat(file_path, return_one_hot: bool = False):
+    if file_path.split(".")[0][-3:] == "cat":
         if return_one_hot:
             return 0
         return "cat"
