@@ -16,6 +16,7 @@ h5py = {version = "*", platform_system = "== 'Darwin'"}
 tensorflow-macos = {version = "*", platform_system = "== 'Darwin'"}
 tensorflow-metal = {version = "*", platform_system = "== 'Darwin'"}
 opencv-python = "*"
+tensorflow-datasets = "*"
 
 [dev-packages]
 
