@@ -3,10 +3,6 @@ from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping
 from helper_functions import flatten_list
-from load_datasets import (
-    train_val_generator,
-    val_generator,
-)
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -80,6 +76,8 @@ def plot_and_print_model_metrics(metrics: pd.DataFrame):
 # int(len(X_train) / 32), int(len(X_val) / 32) -> (50, 12)
 def fit_then_evaluate_model(
     model,
+    train_generator,
+    val_generator,
     *,
     steps_per_epoch=50,
     validation_steps=12,
@@ -89,7 +87,7 @@ def fit_then_evaluate_model(
         monitor="val_acc", mode="max", patience=50, restore_best_weights=True
     )
     model.fit(
-        train_val_generator,
+        train_generator,
         steps_per_epoch=steps_per_epoch,
         epochs=100000,
         callbacks=[early_stopper],

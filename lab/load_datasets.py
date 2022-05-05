@@ -1,9 +1,7 @@
-from tkinter.messagebox import RETRY
 from cv2 import resize
 from helper_functions import shuffle_list, check_if_cat
 from os.path import abspath
 from random import seed
-from sys import platform
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import glob
 import matplotlib.pyplot as plt
@@ -39,24 +37,6 @@ test_images = shuffle_list(
     ]
 )
 
-
-resized_train_images = [
-    (resize(image[0], (32, 32)), image[1]) for image in train_images
-]
-resized_val_images = [(resize(image[0], (32, 32)), image[1]) for image in val_images]
-resized_test_images = [(resize(image[0], (32, 32)), image[1]) for image in test_images]
-
-
-X_train = np.array([image[0] for image in resized_train_images]).astype("float32") / 255
-X_val = np.array([image[0] for image in resized_val_images]).astype("float32") / 255
-X_test = np.array([image[0] for image in resized_test_images]).astype("float32") / 255
-X_train.shape
-
-y_train = np.array([image[1] for image in resized_train_images])
-y_val = np.array([image[1] for image in resized_val_images])
-y_test = np.array([image[1] for image in resized_test_images])
-y_train.shape
-
 train_image_generator = ImageDataGenerator(
     rotation_range=90,
     shear_range=0.2,
@@ -67,9 +47,43 @@ train_image_generator = ImageDataGenerator(
 )
 val_image_generator = ImageDataGenerator()
 
-train_val_generator = train_image_generator.flow(X_train, y_train, batch_size=32)
-val_generator = val_image_generator.flow(X_val, y_val, batch_size=32)
 
-train_generator = val_image_generator.flow(
-    np.concatenate((X_train, X_val)), np.concatenate((y_train, y_val)), batch_size=32
-)
+y_train = np.array([image[1] for image in train_images])
+y_val = np.array([image[1] for image in val_images])
+y_test = np.array([image[1] for image in test_images])
+
+
+def create_generators(image_size, *, just_train_generator=False):
+    if just_train_generator:
+        resized_test_images = [
+            (resize(image[0], image_size), image[1]) for image in test_images
+        ]
+        X_test = (
+            np.array([image[0] for image in resized_test_images]).astype("float32")
+            / 255
+        )
+        return (
+            train_image_generator.flow(
+                np.concatenate((X_train, X_val)),
+                np.concatenate((y_train, y_val)),
+                batch_size=32,
+            ),
+            X_test,
+        )
+
+    resized_train_images = [
+        (resize(image[0], image_size), image[1]) for image in train_images
+    ]
+    resized_val_images = [
+        (resize(image[0], image_size), image[1]) for image in val_images
+    ]
+
+    X_train = (
+        np.array([image[0] for image in resized_train_images]).astype("float32") / 255
+    )
+    X_val = np.array([image[0] for image in resized_val_images]).astype("float32") / 255
+
+    train_generator = train_image_generator.flow(X_train, y_train, batch_size=32)
+    val_generator = val_image_generator.flow(X_val, y_val, batch_size=32)
+
+    return (train_generator, val_generator)
