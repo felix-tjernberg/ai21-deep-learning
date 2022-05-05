@@ -41,13 +41,17 @@ def model_cnn_2_classes(
     flatten_layer_dropout_rate=0.3,
     strides=2,
     kernel_size=(3, 3),
+    input_shape=(32, 32, 3),
 ):
     flatten_layer = [Flatten(), Dropout(flatten_layer_dropout_rate)]
     model = Sequential(
         flatten_list(
             [
                 create_Conv2D_MaxPooling2D_pairs(
-                    kernel_number, strides=strides, kernel_size=kernel_size
+                    kernel_number,
+                    strides=strides,
+                    kernel_size=kernel_size,
+                    input_shape=input_shape,
                 )
                 for kernel_number in cnn_kernel_numbers
             ]
@@ -82,9 +86,10 @@ def fit_then_evaluate_model(
     steps_per_epoch=50,
     validation_steps=12,
     model_fit_verbosity=0,
+    patience=50,
 ):
     early_stopper = EarlyStopping(
-        monitor="val_acc", mode="max", patience=50, restore_best_weights=True
+        monitor="val_acc", mode="max", patience=patience, restore_best_weights=True
     )
     model.fit(
         train_generator,

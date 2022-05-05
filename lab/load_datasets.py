@@ -7,7 +7,7 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 
-seed(418)
+seed(418)  # I'm a teapot :D
 current_directory = abspath("")
 
 train_images = shuffle_list(
@@ -48,12 +48,18 @@ train_image_generator = ImageDataGenerator(
 val_image_generator = ImageDataGenerator()
 
 
-y_train = np.array([image[1] for image in train_images])
-y_val = np.array([image[1] for image in val_images])
-y_test = np.array([image[1] for image in test_images])
+def create_generators(image_size, *, just_train_generator=False, no_transforms=False):
+    y_train = np.array([image[1] for image in train_images])
+    y_val = np.array([image[1] for image in val_images])
 
+    resized_train_images = [(resize(image[0], image_size)) for image in train_images]
+    resized_val_images = [(resize(image[0], image_size)) for image in val_images]
 
-def create_generators(image_size, *, just_train_generator=False):
+    X_train = (
+        np.array([image for image in resized_train_images]).astype("float32") / 255
+    )
+    X_val = np.array([image for image in resized_val_images]).astype("float32") / 255
+
     if just_train_generator:
         resized_test_images = [
             (resize(image[0], image_size), image[1]) for image in test_images
@@ -69,21 +75,15 @@ def create_generators(image_size, *, just_train_generator=False):
                 batch_size=32,
             ),
             X_test,
+            np.array([image[1] for image in test_images]),
         )
 
-    resized_train_images = [
-        (resize(image[0], image_size), image[1]) for image in train_images
-    ]
-    resized_val_images = [
-        (resize(image[0], image_size), image[1]) for image in val_images
-    ]
+    val_generator = val_image_generator.flow(X_val, y_val, batch_size=32)
 
-    X_train = (
-        np.array([image[0] for image in resized_train_images]).astype("float32") / 255
-    )
-    X_val = np.array([image[0] for image in resized_val_images]).astype("float32") / 255
+    if no_transforms:
+        train_generator = val_image_generator.flow(X_train, y_train, batch_size=32)
+        return (train_generator, val_generator)
 
     train_generator = train_image_generator.flow(X_train, y_train, batch_size=32)
-    val_generator = val_image_generator.flow(X_val, y_val, batch_size=32)
 
     return (train_generator, val_generator)
