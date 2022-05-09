@@ -7,6 +7,45 @@ from helper_functions import flatten_list
 import matplotlib.pyplot as plt
 import pandas as pd
 
+
+def model_transference_2_classes(
+    base_model,
+    mlp_node_dropout_pairs,
+    *,
+    name: str = "transferacne_model_2_classes",
+    optimizer=Adam(learning_rate=0.001),
+    metrics=["acc"],
+    flatten_layer_dropout_rate=0.3,
+):
+    return (
+        flatten_list([base_model, Flatten(flatten_layer_dropout_rate)])
+        + flatten_list(
+            [
+                create_Dense_Dropout_pairs(node_dropout_pair)
+                for node_dropout_pair in mlp_node_dropout_pairs
+            ]
+        )
+        + [Dense(1, activation="sigmoid", name="output_layer")]
+    )
+    model = Sequential(
+        flatten_list([base_model, Flatten(flatten_layer_dropout_rate)])
+        + flatten_list(
+            [
+                create_Dense_Dropout_pairs(node_dropout_pair)
+                for node_dropout_pair in mlp_node_dropout_pairs
+            ]
+        )
+        + [Dense(1, activation="sigmoid", name="output_layer")],
+        name=name,
+    )
+
+    for layer in base_model.layers:
+        layer.trainable = False
+
+    model.compile(loss="binary_crossentropy", optimizer=optimizer, metrics=metrics)
+    return model
+
+
 # print(X_train.shape[1:]) -> (32, 32, 3)
 def create_Conv2D_MaxPooling2D_pairs(
     kernel_number, *, strides=2, kernel_size=(3, 3), input_shape=(32, 32, 3)
