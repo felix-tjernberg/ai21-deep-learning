@@ -8,7 +8,33 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def model_transference_2_classes(
+def model_transference_2_classes_mlp_layers(
+    mlp_node_dropout_pairs,
+    *,
+    name: str = "transferacne_model_2_classes",
+    optimizer=Adam(learning_rate=0.001),
+    metrics=["acc"],
+    flatten_layer_dropout_rate=0.3,
+):
+    for layer in base_model.layers:
+        layer.trainable = False
+
+    model = Sequential(
+        [Flatten(flatten_layer_dropout_rate)]
+        + flatten_list(
+            [
+                create_Dense_Dropout_pairs(node_dropout_pair)
+                for node_dropout_pair in mlp_node_dropout_pairs
+            ]
+        )
+        + [Dense(1, activation="sigmoid", name="output_layer")],
+        name=name,
+    )
+    model.compile(loss="binary_crossentropy", optimizer=optimizer, metrics=metrics)
+    return model
+
+
+def model_transference_2_classes_combined_method(
     base_model,
     mlp_node_dropout_pairs,
     *,
@@ -35,9 +61,12 @@ def model_transference_2_classes(
     return model
 
 
-# print(X_train.shape[1:]) -> (32, 32, 3)
 def create_Conv2D_MaxPooling2D_pairs(
-    kernel_number, *, strides=2, kernel_size=(3, 3), input_shape=(32, 32, 3)
+    kernel_number,
+    *,
+    strides=2,
+    kernel_size=(3, 3),
+    input_shape=(32, 32, 3),  # print(X_train.shape[1:]) -> (32, 32, 3)
 ):
     return [
         Conv2D(
@@ -105,14 +134,13 @@ def plot_and_print_model_metrics(metrics: pd.DataFrame):
     metrics[["acc", "val_acc"]].plot(ax=ax[1], grid=True)
 
 
-# int(len(X_train) / 32), int(len(X_val) / 32) -> (50, 12)
 def fit_then_evaluate_model(
     model,
     train_generator,
     val_generator,
     *,
-    steps_per_epoch=50,
-    validation_steps=12,
+    steps_per_epoch=50,  # int(len(X_train) / 32) -> 50
+    validation_steps=12,  #  int(len(X_val) / 32) -> 12
     model_fit_verbosity=0,
     patience=10,
 ):
