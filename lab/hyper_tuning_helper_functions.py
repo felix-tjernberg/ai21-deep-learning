@@ -43,8 +43,7 @@ def model_transference_2_classes_combined_method(
     metrics=["acc"],
     flatten_layer_dropout_rate=0.3,
 ):
-    for layer in base_model.layers:
-        layer.trainable = False
+    base_model.trainable = False
 
     model = Sequential(
         [base_model, Flatten(), Dropout(flatten_layer_dropout_rate)]
