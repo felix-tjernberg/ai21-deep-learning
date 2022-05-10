@@ -17,18 +17,11 @@ def model_transference_2_classes(
     metrics=["acc"],
     flatten_layer_dropout_rate=0.3,
 ):
-    return (
-        flatten_list([base_model, Flatten(flatten_layer_dropout_rate)])
-        + flatten_list(
-            [
-                create_Dense_Dropout_pairs(node_dropout_pair)
-                for node_dropout_pair in mlp_node_dropout_pairs
-            ]
-        )
-        + [Dense(1, activation="sigmoid", name="output_layer")]
-    )
+    for layer in base_model.layers:
+        layer.trainable = False
+
     model = Sequential(
-        flatten_list([base_model, Flatten(flatten_layer_dropout_rate)])
+        [base_model, Flatten(), Dropout(flatten_layer_dropout_rate)]
         + flatten_list(
             [
                 create_Dense_Dropout_pairs(node_dropout_pair)
@@ -38,10 +31,6 @@ def model_transference_2_classes(
         + [Dense(1, activation="sigmoid", name="output_layer")],
         name=name,
     )
-
-    for layer in base_model.layers:
-        layer.trainable = False
-
     model.compile(loss="binary_crossentropy", optimizer=optimizer, metrics=metrics)
     return model
 
@@ -125,7 +114,7 @@ def fit_then_evaluate_model(
     steps_per_epoch=50,
     validation_steps=12,
     model_fit_verbosity=0,
-    patience=50,
+    patience=10,
 ):
     early_stopper = EarlyStopping(
         monitor="val_acc", mode="max", patience=patience, restore_best_weights=True
