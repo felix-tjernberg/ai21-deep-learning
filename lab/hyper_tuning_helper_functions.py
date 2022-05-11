@@ -1,5 +1,5 @@
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D, Input
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping
 from helper_functions import flatten_list
@@ -8,23 +8,21 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def model_transference_2_classes_mlp_layers(
-    mlp_node_dropout_pairs,
+def model_mlp_2_classes(
+    dense_and_dropout_pairs,
+    input_shape,
     *,
     name: str = "transferacne_model_2_classes",
     optimizer=Adam(learning_rate=0.001),
     metrics=["acc"],
     flatten_layer_dropout_rate=0.3,
 ):
-    for layer in base_model.layers:
-        layer.trainable = False
-
     model = Sequential(
-        [Flatten(flatten_layer_dropout_rate)]
+        [Dense(shape=input_shape), Dropout(flatten_layer_dropout_rate)]
         + flatten_list(
             [
-                create_Dense_Dropout_pairs(node_dropout_pair)
-                for node_dropout_pair in mlp_node_dropout_pairs
+                create_Dense_Dropout_pairs(dense_and_dropout_pair)
+                for dense_and_dropout_pair in dense_and_dropout_pairs
             ]
         )
         + [Dense(1, activation="sigmoid", name="output_layer")],
