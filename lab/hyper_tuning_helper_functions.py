@@ -11,17 +11,6 @@ from sklearn.metrics import (
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
-
-
-def extract_X_y_from_generator(generator):
-    steps = generator.n // generator.batch_size
-    X, y = [], []
-    for _ in range(steps):
-        X_batch, y_batch = generator.next()
-        X.extend(X_batch)
-        y.extend(y_batch)
-    return np.array(X), np.array(y)
 
 
 def show_classification_evaluation_metrics(
