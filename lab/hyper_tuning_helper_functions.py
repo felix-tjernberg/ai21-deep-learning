@@ -15,10 +15,10 @@ def model_mlp_2_classes(
     name: str = "transferacne_model_2_classes",
     optimizer=Adam(learning_rate=0.001),
     metrics=["acc"],
-    flatten_layer_dropout_rate=0.3,
+    first_layer_dropout_rate=0.3,
 ):
     model = Sequential(
-        [Dense(shape=input_shape), Dropout(flatten_layer_dropout_rate)]
+        [Input(shape=input_shape), Dropout(first_layer_dropout_rate)]
         + flatten_list(
             [
                 create_Dense_Dropout_pairs(dense_and_dropout_pair)
@@ -151,6 +151,32 @@ def fit_then_evaluate_model(
         callbacks=[early_stopper],
         validation_data=val_generator,
         validation_steps=validation_steps,
+        verbose=model_fit_verbosity,
+    )
+    metrics = pd.DataFrame(model.history.history)
+    plot_and_print_model_metrics(metrics)
+
+    return model
+
+
+def fit_then_evaluate_mlp_model(
+    model,
+    X_train,
+    y_train,
+    validation_data,
+    *,
+    model_fit_verbosity=0,
+    patience=10,
+):
+    early_stopper = EarlyStopping(
+        monitor="val_acc", mode="max", patience=patience, restore_best_weights=True
+    )
+    model.fit(
+        X_train,
+        y_train,
+        epochs=100000,
+        callbacks=[early_stopper],
+        validation_data=validation_data,
         verbose=model_fit_verbosity,
     )
     metrics = pd.DataFrame(model.history.history)
