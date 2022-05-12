@@ -3,9 +3,34 @@ from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping
 from helper_functions import flatten_list
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    ConfusionMatrixDisplay,
+)
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
+
+
+def extract_X_y_from_generator(generator):
+    steps = generator.n // generator.batch_size
+    X, y = [], []
+    for _ in range(steps):
+        X_batch, y_batch = generator.next()
+        X.extend(X_batch)
+        y.extend(y_batch)
+    return np.array(X), np.array(y)
+
+
+def show_classification_evaluation_metrics(
+    y_pred, y_test, display_labels=["True", "False"]
+):
+    print(classification_report(y_test, y_pred))
+    ConfusionMatrixDisplay(
+        confusion_matrix(y_test, y_pred), display_labels=display_labels
+    ).plot()
 
 
 def model_mlp_2_classes(

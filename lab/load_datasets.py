@@ -87,3 +87,18 @@ def create_generators(image_size, *, just_train_generator=False, no_transforms=F
     train_generator = train_image_generator.flow(X_train, y_train, batch_size=32)
 
     return (train_generator, val_generator)
+
+
+def extract_X_y_from_generator(generator):
+    steps = generator.n // generator.batch_size
+    X, y = [], []
+    for _ in range(steps):
+        X_batch, y_batch = generator.next()
+        X.extend(X_batch)
+        y.extend(y_batch)
+    return np.array(X), np.array(y)
+
+
+def extract_feature_maps(model, generator):
+    X, y = extract_X_y_from_generator(generator)
+    return model.predict(X), y
