@@ -17,6 +17,8 @@ tensorflow-macos = {version = "*", platform_system = "== 'Darwin'"}
 tensorflow-metal = {version = "*", platform_system = "== 'Darwin'"}
 opencv-python = "*"
 tensorflow-datasets = "*"
+nltk = "*"
+pyjokes = "*"
 
 [dev-packages]
 notebook = "*"
