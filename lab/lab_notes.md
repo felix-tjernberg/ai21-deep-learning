@@ -95,3 +95,45 @@ This then became my choice for training on training and validation data: Xceptio
 [The results speaks for itself](https://github.com/felix-tjernberg/ai21-deep-learning/blob/main/lab/2_model_selection_and_inference.ipynb), only 8 misclassified images!
 
 ### Xception summary
+
+The name Xception is a abbreviation of Extreme Inception, Inception is the name off the network Xception tried to improve. The goal of Xception was to decrease the amount of computation needed to run the network during inference time
+
+#### Depthwise separable convolution
+
+Inception net uses something called depthwise convolution, which is a faster way of doing multidimensional convolutions
+
+It does this by doing the filtering convolutions on each dimension _(rgb channels in this case)_ and then stack the dimensions together to create the convulsions of the whole image, this is less computational expensive as addition of each dimension is cheaper than of multiplication on all dimensions _(Addition is faster to perform that multiplication on a computer)_
+
+> I wonder tho what would happen if you have some sort of lookup table for all possible multiplications when it comes to images, as they only have 256 possible numbers that can be multiplied, or what happens on a analog computer when it comes to multiplication _(Analog computers might be the way models are run in the future)_
+
+[In this video](https://www.youtube.com/watch?v=vfCvmenkbZA) the person shows how an example on the difference in the amount of operation required during inference time for standard convolution vs depthwise separated convolution
+
+Inception also does the convolutions in quite a complex way which you can [learn about in this video](https://www.youtube.com/watch?v=STTrebkhnIk). Inception was also inspired by methods used in Resnet to do the convolutions which you can [learn about from this video](https://www.youtube.com/watch?v=rya-1nX8ktc)
+
+Xception takes what Inception does and simplifies the depthwise separable convolutions and what [Resnext](https://www.youtube.com/watch?v=l7CK-u8InsA) did in the for the convolution steps
+
+> TODO Understand and then explain depthwise and pointwise convolution, need feedback from teacher
+
+Xceptions method of doing depthwise separable convolution works in "three" steps which the call flows _(1-2 is the depthwise part and 3 is the pointwise part)_:
+
+1. The image goes through the entry flow convolutions which creates a 19x19x728 feature map
+2. Takes feature maps and then do more convolutions with 3x3 8 times
+3. Finally does a 1x1 convolution and adds the layers together to a 2048 dimensional vector
+
+I did the research about Xception after using the model and noticed that they used logistic regression as prediction layer in the end and also said that the mlp layers after the convolutions was optional, so now i'm curious if RandomForest improves the prediction strength above logistic regression which they used in the original model
+
+> They also used GlobalAveragePooling when creating the 2048 dimensional vectors in the end I tried both Flatten and GlobalAveragePooling
+
+#### Video resources links
+
+[Depthwise separable convolution explainer](https://www.youtube.com/watch?v=T7o3xvJLuHk)
+
+[Depthwise separable convolution operation difference example](https://www.youtube.com/watch?v=vfCvmenkbZA)
+
+[Short Xception overview](https://www.youtube.com/watch?v=r-QdClmLSqw)
+
+[Inception explainer](https://www.youtube.com/watch?v=STTrebkhnIk)
+
+[Inception explainer](https://www.youtube.com/watch?v=STTrebkhnIk)
+
+[Resnet explainer](https://www.youtube.com/watch?v=rya-1nX8ktc)
